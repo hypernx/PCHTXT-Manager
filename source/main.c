@@ -44,33 +44,47 @@ static void scan_files(void) {
     if (g_selected >= g_file_count) g_selected = g_file_count > 0 ? g_file_count - 1 : 0;
 }
 
-static void toggle_selected(void) {
+static void set_selected_enabled(bool enable) {
     if (g_file_count == 0 || g_selected < 0 || g_selected >= g_file_count) return;
+    if (g_files[g_selected].enabled == enable) return;
 
     char old_path[NAME_LEN * 2], new_path[NAME_LEN * 2];
     const char *name = g_files[g_selected].name;
+    size_t len = strlen(name);
+    const char *disabled_suffix = ".disabled";
+    size_t suffix_len = strlen(disabled_suffix);
 
     snprintf(old_path, sizeof(old_path), "%s/%s", MANAGED_DIR, name);
-
-    if (g_files[g_selected].enabled) {
-        // Disable: sample.pchtxt -> sample.pchtxt.disabled
-        snprintf(new_path, sizeof(new_path), "%s/%s.disabled", MANAGED_DIR, name);
-    } else {
-        // Enable: sample.pchtxt.disabled -> sample.pchtxt
-        size_t len = strlen(name);
-        size_t suffix_len = strlen(".disabled");
-        if (len <= suffix_len) return;
+    if (enable) {
+        if (len <= suffix_len || !ends_with(name, disabled_suffix)) return;
         snprintf(new_path, sizeof(new_path), "%s/%.*s", MANAGED_DIR,
                  (int)(len - suffix_len), name);
+    } else {
+        if (!ends_with(name, ".pchtxt")) return;
+        snprintf(new_path, sizeof(new_path), "%s/%s.disabled", MANAGED_DIR, name);
+    }
+
+    // Never overwrite another patch file if the target name already exists.
+    struct stat st;
+    if (stat(new_path, &st) == 0) {
+        printf("\nCannot change state: target file already exists.\n");
+        consoleUpdate(NULL);
+        svcSleepThread(1500ULL * 1000 * 1000);
+        return;
     }
 
     if (rename(old_path, new_path) == 0) {
         scan_files();
     } else {
-        printf("\nRename failed. Check SD card permissions and file name.\n");
+        printf("\nRename failed. Check the SD card and file name.\n");
         consoleUpdate(NULL);
         svcSleepThread(1500ULL * 1000 * 1000);
     }
+}
+
+static void toggle_selected(void) {
+    if (g_file_count == 0 || g_selected < 0 || g_selected >= g_file_count) return;
+    set_selected_enabled(!g_files[g_selected].enabled);
 }
 
 static void draw_ui(void) {
@@ -152,6 +166,8 @@ int main(int argc, char **argv) {
         if ((keys & HidNpadButton_B) || (keys & HidNpadButton_Plus)) break;
         if ((keys & HidNpadButton_Up) && g_file_count > 0 && g_selected > 0) g_selected--;
         if ((keys & HidNpadButton_Down) && g_file_count > 0 && g_selected < g_file_count - 1) g_selected++;
+        if (keys & HidNpadButton_X) set_selected_enabled(true);
+        if (keys & HidNpadButton_Y) set_selected_enabled(false);
         if (keys & HidNpadButton_A) toggle_selected();
         draw_ui();
         svcSleepThread(16 * 1000 * 1000);
