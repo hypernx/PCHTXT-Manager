@@ -7,11 +7,11 @@ DEVKITPRO ?= /opt/devkitpro
 PREFIX := aarch64-none-elf-
 CC := $(PREFIX)gcc
 
-CFLAGS := -g -Wall -Wextra -O2 -ffunction-sections -fdata-sections
-CFLAGS += -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft
+ARCH := -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
+CFLAGS := -g -Wall -Wextra -O2 -ffunction-sections -fdata-sections $(ARCH)
 CFLAGS += -D__SWITCH__ -I$(DEVKITPRO)/libnx/include
 
-LDFLAGS := -specs=$(DEVKITPRO)/libnx/switch.specs
+LDFLAGS := -specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH)
 LDFLAGS += -Wl,--gc-sections -L$(DEVKITPRO)/libnx/lib
 LIBS := -lnx
 
