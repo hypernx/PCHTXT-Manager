@@ -30,11 +30,9 @@ $(BUILD)/%.o: $(SOURCES)/%.c | $(BUILD)
 $(TARGET).elf: $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-icon.jpg: icon.svg
-	convert icon.svg -resize 256x256 -gravity center -extent 256x256 -quality 90 $@
-
-$(TARGET).nro: $(TARGET).elf icon.jpg
-	elf2nro $(TARGET).elf $@ --icon=icon.jpg
+# Build without an optional icon so the CI runner does not need ImageMagick.
+$(TARGET).nro: $(TARGET).elf
+	elf2nro $(TARGET).elf $@
 
 clean:
 	rm -rf $(BUILD) $(TARGET).elf $(TARGET).nro
