@@ -84,46 +84,46 @@ static void toggle_selected(void) {
 
 static void draw_ui(void) {
     consoleClear();
-    printf("\\x1b[1;37;41m  PCHTXT-MANAGER  \\x1b[0m  \\x1b[90mHOMEbrew utility\\x1b[0m\\n");
-    printf("\\x1b[31m============================================================\\x1b[0m\\n");
-    printf("\\n");
-    printf("  \\x1b[1;31mFILE LIBRARY\\x1b[0m                                      \\x1b[90m01 / 03\\x1b[0m\\n");
-    printf("  %s\\n", tr("SDカード内の管理フォルダー", "MANAGED SD FOLDER", "SD 卡管理目录"));
-    printf("  \\x1b[36mswitch/PCHTXT-Manager/\\x1b[0m\\n\\n");
-    printf("  \\x1b[90m----------------------------------------------------------\\x1b[0m\\n");
+    printf("\x1b[1;37;41m  PCHTXT-MANAGER  \x1b[0m  \x1b[90mHOMEbrew utility\x1b[0m\n");
+    printf("\x1b[31m============================================================\x1b[0m\n");
+    printf("\n");
+    printf("  \x1b[1;31mFILE LIBRARY\x1b[0m                                      \x1b[90m01 / 03\x1b[0m\n");
+    printf("  %s\n", tr("SDカード内の管理フォルダー", "MANAGED SD FOLDER", "SD 卡管理目录"));
+    printf("  \x1b[36mswitch/PCHTXT-Manager/\x1b[0m\n\n");
+    printf("  \x1b[90m----------------------------------------------------------\x1b[0m\n");
     if (g_file_count == 0) {
-        printf("\\n  \\x1b[1;33m◇\\x1b[0m  %s\\n",
+        printf("\n  \x1b[1;33m◇\x1b[0m  %s\n",
                tr("ファイルがまだありません", "Your library is empty", "文件列表为空"));
-        printf("     %s\\n", tr("このフォルダーに .pchtxt を配置してください。",
+        printf("     %s\n", tr("このフォルダーに .pchtxt を配置してください。",
                            "Place your .pchtxt files in this folder.",
                            "请将 .pchtxt 文件放入此文件夹。"));
-        printf("\\n");
+        printf("\n");
     } else {
         for (int i = 0; i < g_file_count; i++) {
-            if (i == g_selected) printf("  \\x1b[1;31m>\\x1b[0m ");
+            if (i == g_selected) printf("  \x1b[1;31m>\x1b[0m ");
             else printf("    ");
             if (g_files[i].enabled)
-                printf("\\x1b[1;32m[ ON ]\\x1b[0m ");
+                printf("\x1b[1;32m[ ON ]\x1b[0m ");
             else
-                printf("\\x1b[90m[ OFF ]\\x1b[0m ");
-            printf("%s\\n", g_files[i].name);
+                printf("\x1b[90m[ OFF ]\x1b[0m ");
+            printf("%s\n", g_files[i].name);
         }
-        printf("\\n  \\x1b[90m%d %s\\x1b[0m\\n", g_file_count,
+        printf("\n  \x1b[90m%d %s\x1b[0m\n", g_file_count,
                tr("件のファイル", "FILES", "个文件"));
     }
-    printf("  \\x1b[90m----------------------------------------------------------\\x1b[0m\\n");
-    printf("\\n  \\x1b[1;31mCONTROLS\\x1b[0m\\n");
-    printf("  \\x1b[37m[↑/↓]\\x1b[0m %s    \\x1b[37m[A]\\x1b[0m %s\\n",
+    printf("  \x1b[90m----------------------------------------------------------\x1b[0m\n");
+    printf("\n  \x1b[1;31mCONTROLS\x1b[0m\n");
+    printf("  \x1b[37m[↑/↓]\x1b[0m %s    \x1b[37m[A]\x1b[0m %s\n",
            tr("選択", "Navigate", "选择"),
            tr("有効 / 無効", "Toggle", "切换"));
-    printf("  \\x1b[37m[X]\\x1b[0m %s    \\x1b[37m[B]\\x1b[0m %s\\n",
+    printf("  \x1b[37m[X]\x1b[0m %s    \x1b[37m[B]\x1b[0m %s\n",
            tr("言語変更", "Language", "语言"),
            tr("終了", "Exit", "退出"));
-    printf("\\n  \\x1b[90mLANGUAGE  \\x1b[0m\\x1b[1;37m%s\\x1b[0m\\n",
+    printf("\n  \x1b[90mLANGUAGE  \x1b[0m\x1b[1;37m%s\x1b[0m\n",
            g_language == LANG_JA ? "日本語" :
            g_language == LANG_EN ? "English" : "简体中文");
-    printf("\\x1b[1;31m============================================================\\x1b[0m\\n");
-    printf("  \\x1b[90mPCHTXT-Manager  |  SD card file organizer\\x1b[0m\\n");
+    printf("\x1b[1;31m============================================================\x1b[0m\n");
+    printf("  \x1b[90mPCHTXT-Manager  |  SD card file organizer\x1b[0m\n");
     consoleUpdate(NULL);
 }
 
