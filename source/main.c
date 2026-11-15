@@ -118,11 +118,8 @@ static void draw_ui(void) {
     }
     printf("  \x1b[90m----------------------------------------------------------\x1b[0m\n");
     printf("\n  \x1b[1;31mCONTROLS\x1b[0m\n");
-    printf("  \x1b[37m[↑/↓]\x1b[0m %s    \x1b[37m[A]\x1b[0m %s\n",
-           tr("選択", "Navigate", "选择"),
-           tr("有効 / 無効", "Toggle", "切换"));
-    printf("  [UP/DOWN] Navigate    [A] Toggle ON/OFF\n");
-    printf("  [B] Exit\n");
+    printf("  [UP/DOWN] Select   [X] Enable   [Y] Disable\n");
+    printf("  [A] Toggle   [B] Exit\n");
     printf("\n  LANGUAGE: ENGLISH ONLY\n");
     printf("\x1b[1;31m============================================================\x1b[0m\n");
     printf("  \x1b[90mPCHTXT-Manager  |  SD card file organizer\x1b[0m\n");
