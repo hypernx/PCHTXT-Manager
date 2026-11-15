@@ -1,28 +1,37 @@
-# devkitPro / libnx Makefile
-.SUFFIXES:
-
+# PCHTXT-Manager - Nintendo Switch homebrew build
 TARGET := PCHTXT-Manager
 BUILD := build
 SOURCES := source
-DATA :=
-INCLUDES := include
 
-# Application metadata
-APP_TITLE := PCHTXT Manager
-APP_AUTHOR := PCHTXT-Manager
-APP_VERSION := 0.1.0
+DEVKITPRO ?= /opt/devkitpro
+PREFIX := aarch64-none-elf-
+CC := $(PREFIX)gcc
 
-# Compiler options
-ARCH := -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft
 CFLAGS := -g -Wall -Wextra -O2 -ffunction-sections -fdata-sections
-CFLAGS += $(ARCH) -D__SWITCH__
-CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
-ASFLAGS := $(ARCH)
-LDFLAGS := -specs=$(DEVKITPRO)/libnx/switch.specs -Wl,--gc-sections
+CFLAGS += -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft
+CFLAGS += -D__SWITCH__ -I$(DEVKITPRO)/libnx/include
+
+LDFLAGS := -specs=$(DEVKITPRO)/libnx/switch.specs
+LDFLAGS += -Wl,--gc-sections -L$(DEVKITPRO)/libnx/lib
 LIBS := -lnx
 
-ifeq ($(strip $(DEVKITPRO)),)
-$(error Please set DEVKITPRO in your environment)
-endif
+SOURCES_C := $(wildcard $(SOURCES)/*.c)
+OBJECTS := $(patsubst $(SOURCES)/%.c,$(BUILD)/%.o,$(SOURCES_C))
 
-include $(DEVKITPRO)/libnx/switch_rules
+.PHONY: all clean
+all: $(TARGET).nro
+
+$(BUILD):
+	mkdir -p $(BUILD)
+
+$(BUILD)/%.o: $(SOURCES)/%.c | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TARGET).elf: $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+$(TARGET).nro: $(TARGET).elf
+	elf2nro $< $@
+
+clean:
+	rm -rf $(BUILD) $(TARGET).elf $(TARGET).nro
