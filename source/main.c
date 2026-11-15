@@ -46,18 +46,31 @@ static void scan_files(void) {
 
 static void toggle_selected(void) {
     if (g_file_count == 0 || g_selected < 0 || g_selected >= g_file_count) return;
+
     char old_path[NAME_LEN * 2], new_path[NAME_LEN * 2];
     const char *name = g_files[g_selected].name;
-    size_t len = strlen(name);
+
     snprintf(old_path, sizeof(old_path), "%s/%s", MANAGED_DIR, name);
+
     if (g_files[g_selected].enabled) {
-        snprintf(new_path, sizeof(new_path), "%s/%.*s.disabled", MANAGED_DIR,
-                 (int)(len - strlen(".pchtxt")), name);
+        // Disable: sample.pchtxt -> sample.pchtxt.disabled
+        snprintf(new_path, sizeof(new_path), "%s/%s.disabled", MANAGED_DIR, name);
     } else {
+        // Enable: sample.pchtxt.disabled -> sample.pchtxt
+        size_t len = strlen(name);
+        size_t suffix_len = strlen(".disabled");
+        if (len <= suffix_len) return;
         snprintf(new_path, sizeof(new_path), "%s/%.*s", MANAGED_DIR,
-                 (int)(len - strlen(".disabled")), name);
+                 (int)(len - suffix_len), name);
     }
-    if (rename(old_path, new_path) == 0) scan_files();
+
+    if (rename(old_path, new_path) == 0) {
+        scan_files();
+    } else {
+        printf("\nRename failed. Check SD card permissions and file name.\n");
+        consoleUpdate(NULL);
+        svcSleepThread(1500ULL * 1000 * 1000);
+    }
 }
 
 static void draw_ui(void) {
