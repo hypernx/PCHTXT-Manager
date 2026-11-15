@@ -117,6 +117,9 @@ static void draw_ui(void) {
 int main(int argc, char **argv) {
     (void)argc; (void)argv;
     consoleInit(NULL);
+    printf("PCHTXT-Manager starting...\n");
+    consoleUpdate(NULL);
+
     padConfigureInput(1, HidNpadStyleSet_NpadStandard);
     PadState pad;
     padInitializeDefault(&pad);
@@ -124,6 +127,7 @@ int main(int argc, char **argv) {
     if (R_FAILED(rc)) {
         printf("Failed to mount SD card (0x%08X).\n", (unsigned)rc);
         printf("Press PLUS to exit.\n");
+        consoleUpdate(NULL);
         while (appletMainLoop()) {
             padUpdate(&pad);
             if (padGetButtonsDown(&pad) & HidNpadButton_Plus) break;
