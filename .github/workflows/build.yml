@@ -21,6 +21,8 @@ jobs:
           command -v aarch64-none-elf-gcc
           command -v elf2nro
           test -d "$DEVKITPRO/libnx/include"
+      - name: Install icon converter
+        run: apt-get update && apt-get install -y imagemagick
       - name: Build
         run: make
       - name: Upload NRO
