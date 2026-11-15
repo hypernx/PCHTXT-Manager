@@ -16,12 +16,11 @@ jobs:
       PATH: /opt/devkitpro/devkitA64/bin:/opt/devkitpro/tools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     steps:
       - uses: actions/checkout@v4
-      - name: Install Switch toolchain and libraries
-        run: dkp-pacman -S --noconfirm devkitA64 libnx switch-tools
-      - name: Verify toolchain
+      - name: Verify preinstalled Switch toolchain
         run: |
           command -v aarch64-none-elf-gcc
           command -v elf2nro
+          test -d "$DEVKITPRO/libnx/include"
       - name: Build
         run: make
       - name: Upload NRO
