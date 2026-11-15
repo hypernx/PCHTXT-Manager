@@ -123,7 +123,11 @@ int main(int argc, char **argv) {
     padConfigureInput(1, HidNpadStyleSet_NpadStandard);
     PadState pad;
     padInitializeDefault(&pad);
-    Result rc = fsdevMountSdmc();
+    // libnx normally mounts sdmc during startup. Only mount it here
+    // if startup did not already make the device available.
+    Result rc = 0;
+    if (fsdevGetDeviceFileSystem("sdmc") == NULL)
+        rc = fsdevMountSdmc();
     if (R_FAILED(rc)) {
         printf("Failed to mount SD card (0x%08X).\n", (unsigned)rc);
         printf("Press PLUS to exit.\n");
