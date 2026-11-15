@@ -13,6 +13,8 @@ jobs:
     container: devkitpro/devkita64:latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Switch development libraries
+        run: dkp-pacman -S --noconfirm switch-dev
       - name: Build
         run: make
       - name: Upload NRO
