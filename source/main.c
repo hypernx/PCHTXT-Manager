@@ -117,13 +117,16 @@ static void draw_ui(void) {
 int main(int argc, char **argv) {
     (void)argc; (void)argv;
     consoleInit(NULL);
+    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+    PadState pad;
+    padInitializeDefault(&pad);
     Result rc = fsdevMountSdmc();
     if (R_FAILED(rc)) {
         printf("Failed to mount SD card (0x%08X).\n", (unsigned)rc);
         printf("Press PLUS to exit.\n");
         while (appletMainLoop()) {
-            hidScanInput();
-            if (hidKeysDown(CONTROLLER_P1_AUTO) & KEY_PLUS) break;
+            padUpdate(&pad);
+            if (padGetButtonsDown(&pad) & HidNpadButton_Plus) break;
         }
         consoleExit(NULL);
         return 1;
@@ -136,13 +139,13 @@ int main(int argc, char **argv) {
     draw_ui();
 
     while (appletMainLoop()) {
-        hidScanInput();
-        u64 keys = hidKeysDown(CONTROLLER_P1_AUTO);
-        if ((keys & KEY_B) || (keys & KEY_PLUS)) break;
-        if ((keys & KEY_DUP) && g_file_count > 0 && g_selected > 0) g_selected--;
-        if ((keys & KEY_DDOWN) && g_file_count > 0 && g_selected < g_file_count - 1) g_selected++;
-        if (keys & KEY_A) toggle_selected();
-        if (keys & KEY_X) {
+        padUpdate(&pad);
+        u64 keys = padGetButtonsDown(&pad);
+        if ((keys & HidNpadButton_B) || (keys & HidNpadButton_Plus)) break;
+        if ((keys & HidNpadButton_Up) && g_file_count > 0 && g_selected > 0) g_selected--;
+        if ((keys & HidNpadButton_Down) && g_file_count > 0 && g_selected < g_file_count - 1) g_selected++;
+        if (keys & HidNpadButton_A) toggle_selected();
+        if (keys & HidNpadButton_X) {
             g_language = (Language)((g_language + 1) % LANG_COUNT);
             save_language();
         }
