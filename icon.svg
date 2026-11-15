@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07152f"/><stop offset="1" stop-color="#020611"/></linearGradient><linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00d8ff"/><stop offset="1" stop-color="#1765ff"/></linearGradient></defs>
+<rect x="5" y="5" width="246" height="246" rx="38" fill="url(#bg)" stroke="#087dff" stroke-width="5"/>
+<path d="M26 108Q128 -5 230 108" fill="none" stroke="url(#blue)" stroke-width="8" stroke-linecap="round"/>
+<rect x="30" y="55" width="196" height="125" rx="18" fill="#111d33" stroke="#263b59" stroke-width="4"/>
+<rect x="64" y="36" width="128" height="146" rx="12" fill="#f5f8ff" stroke="#101a2c" stroke-width="5"/>
+<path d="M166 36v27h26" fill="#d9e8ff" stroke="#101a2c" stroke-width="3"/>
+<text x="128" y="103" text-anchor="middle" font-family="DejaVu Sans,sans-serif" font-size="21" font-weight="bold" fill="#101a2c">.PCHTXT</text>
+<path d="M84 120h88M84 134h72M84 148h60" stroke="#7992b4" stroke-width="5" stroke-linecap="round"/>
+<circle cx="196" cy="163" r="28" fill="#17263d" stroke="#fff" stroke-width="4"/>
+<circle cx="196" cy="163" r="10" fill="#f5f8ff"/>
+<text x="128" y="218" text-anchor="middle" font-family="DejaVu Sans,sans-serif" font-size="28" font-weight="bold" fill="#fff">PCHTXT</text>
+<text x="128" y="240" text-anchor="middle" font-family="DejaVu Sans,sans-serif" font-size="15" font-weight="bold" fill="#00d8ff">MANAGER</text>
+</svg>
