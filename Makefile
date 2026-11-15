@@ -30,8 +30,11 @@ $(BUILD)/%.o: $(SOURCES)/%.c | $(BUILD)
 $(TARGET).elf: $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-$(TARGET).nro: $(TARGET).elf
-	elf2nro $< $@
+icon.jpg: icon.svg
+	convert icon.svg -resize 256x256 -gravity center -extent 256x256 -quality 90 $@
+
+$(TARGET).nro: $(TARGET).elf icon.jpg
+	elf2nro $(TARGET).elf $@ --icon=icon.jpg
 
 clean:
 	rm -rf $(BUILD) $(TARGET).elf $(TARGET).nro
