@@ -9,43 +9,21 @@
 #define MAX_FILES 64
 #define NAME_LEN 256
 
-typedef enum { LANG_JA = 0, LANG_EN, LANG_ZH, LANG_COUNT } Language;
 typedef struct { char name[NAME_LEN]; bool enabled; } PatchFile;
 
 static PatchFile g_files[MAX_FILES];
 static int g_file_count;
 static int g_selected;
-static Language g_language = LANG_JA;
 
 static const char *tr(const char *ja, const char *en, const char *zh) {
-    if (g_language == LANG_EN) return en;
-    if (g_language == LANG_ZH) return zh;
-    return ja;
+    (void)ja;
+    (void)zh;
+    return en;
 }
 
 static bool ends_with(const char *text, const char *suffix) {
     size_t a = strlen(text), b = strlen(suffix);
     return a >= b && strcmp(text + a - b, suffix) == 0;
-}
-
-static void load_language(void) {
-    char path[NAME_LEN];
-    snprintf(path, sizeof(path), "%s/settings.cfg", MANAGED_DIR);
-    FILE *fp = fopen(path, "r");
-    if (!fp) return;
-    int value = 0;
-    if (fscanf(fp, "%d", &value) == 1 && value >= 0 && value < LANG_COUNT)
-        g_language = (Language)value;
-    fclose(fp);
-}
-
-static void save_language(void) {
-    char path[NAME_LEN];
-    snprintf(path, sizeof(path), "%s/settings.cfg", MANAGED_DIR);
-    FILE *fp = fopen(path, "w");
-    if (!fp) return;
-    fprintf(fp, "%d\n", (int)g_language);
-    fclose(fp);
 }
 
 static void scan_files(void) {
@@ -155,7 +133,6 @@ int main(int argc, char **argv) {
 
     mkdir("sdmc:/switch", 0777);
     mkdir(MANAGED_DIR, 0777);
-    load_language();
     scan_files();
     draw_ui();
 
@@ -166,10 +143,6 @@ int main(int argc, char **argv) {
         if ((keys & HidNpadButton_Up) && g_file_count > 0 && g_selected > 0) g_selected--;
         if ((keys & HidNpadButton_Down) && g_file_count > 0 && g_selected < g_file_count - 1) g_selected++;
         if (keys & HidNpadButton_A) toggle_selected();
-        if (keys & HidNpadButton_X) {
-            g_language = (Language)((g_language + 1) % LANG_COUNT);
-            save_language();
-        }
         draw_ui();
         svcSleepThread(16 * 1000 * 1000);
     }
