@@ -1,4 +1,5 @@
 #include <MainApplication.hpp>
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <sys/stat.h>
