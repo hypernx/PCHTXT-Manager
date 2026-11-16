@@ -2,7 +2,7 @@ name: Build NRO
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature/cpp-graphical-ui ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -16,11 +16,18 @@ jobs:
       PATH: /opt/devkitpro/devkitA64/bin:/opt/devkitpro/tools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     steps:
       - uses: actions/checkout@v4
-      - name: Verify preinstalled Switch toolchain
+        with:
+          submodules: recursive
+      - name: Fetch Plutonium UI library
+        run: git clone --depth 1 https://github.com/XorTroll/Plutonium.git Plutonium
+      # The devkita64 Docker image already includes the Switch portlibs.
+      # Avoid dkp-pacman here: pkg.devkitpro.org may return HTTP 403 on GitHub-hosted runners.
+      - name: Verify toolchain and Switch libraries
         run: |
-          command -v aarch64-none-elf-gcc
+          command -v aarch64-none-elf-g++
           command -v elf2nro
           test -d "$DEVKITPRO/libnx/include"
+          test -d "$DEVKITPRO/portlibs/switch/include/SDL2"
       - name: Install icon converter
         run: apt-get update && apt-get install -y imagemagick
       - name: Build
