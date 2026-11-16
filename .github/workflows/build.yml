@@ -20,14 +20,14 @@ jobs:
           submodules: recursive
       - name: Fetch Plutonium UI library
         run: git clone --depth 1 https://github.com/XorTroll/Plutonium.git Plutonium
-      - name: Install Switch GUI dependencies
-        run: |
-          dkp-pacman -S --noconfirm switch-sdl2 switch-sdl2_ttf switch-sdl2_image switch-sdl2_gfx switch-sdl2_mixer switch-mesa switch-glad switch-glm switch-libdrm_nouveau switch-libwebp switch-libpng switch-freetype switch-bzip2 switch-libjpeg-turbo switch-opusfile switch-libopus
-      - name: Verify toolchain
+      # The devkita64 Docker image already includes the Switch portlibs.
+      # Avoid dkp-pacman here: pkg.devkitpro.org may return HTTP 403 on GitHub-hosted runners.
+      - name: Verify toolchain and Switch libraries
         run: |
           command -v aarch64-none-elf-g++
           command -v elf2nro
           test -d "$DEVKITPRO/libnx/include"
+          test -d "$DEVKITPRO/portlibs/switch/include/SDL2"
       - name: Install icon converter
         run: apt-get update && apt-get install -y imagemagick
       - name: Build
