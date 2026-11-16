@@ -14,10 +14,14 @@ class MainLayout : public pu::ui::Layout {
 private:
     std::vector<PatchFile> files;
     int selected = 0;
-    std::string message = "A: Toggle   X: Enable   Y: Disable";
-    pu::ui::elm::TextBlock::Ref count_text;
+    bool japanese = true;
+    std::string message;
+    static constexpr const char *LanguagePath = "sdmc:/switch/PCHTXT-Manager/language.txt";
 
     static bool EndsWith(const std::string &value, const std::string &suffix);
+    void LoadLanguage();
+    void SaveLanguage();
+    const char *Text(const char *ja, const char *en) const;
     void ScanFiles();
     bool SetSelectedEnabled(bool enable);
 
@@ -30,6 +34,7 @@ public:
     void EnableSelected();
     void DisableSelected();
     void ToggleSelected();
+    void ToggleLanguage();
 };
 
 class MainApplication : public pu::ui::Application {
