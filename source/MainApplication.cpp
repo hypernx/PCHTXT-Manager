@@ -176,7 +176,7 @@ void MainLayout::Refresh() {
     AddText(this, 62, 615, std::to_string(this->files.size()) + this->Text(" 個のファイル", " FILE(S)"), Muted, pu::ui::DefaultFontSize::Small);
     AddText(this, 62, 650, this->message, White, pu::ui::DefaultFontSize::Small);
     AddPanel(this, 0, 690, 1280, 30, Panel, 0);
-    AddText(this, 42, 691, this->Text("↑/↓ 選択   A 切替   X 有効   Y 無効   ＋ 言語   B 戻る", "UP/DOWN Select   A Toggle   X Enable   Y Disable   + Language   B Exit"), White, pu::ui::DefaultFontSize::Small);
+    AddText(this, 42, 691, this->Text("↑/↓ 選択   A 切替   X 有効   Y 無効   − 言語   ＋ 終了", "UP/DOWN Select   A Toggle   X Enable   Y Disable   - Language   + Exit"), White, pu::ui::DefaultFontSize::Small);
     AddText(this, 870, 615, this->Text("ファイル整理のみ・パッチ適用はしません", "FILE ORGANIZER ONLY - DOES NOT APPLY PATCHES"), Muted, pu::ui::DefaultFontSize::Small);
 }
 
@@ -215,12 +215,12 @@ void MainApplication::OnLoad() {
     this->layout = MainLayout::New();
     this->LoadLayout(this->layout);
     this->SetOnInput([&](const u64 keysDown, const u64, const u64, const pu::ui::TouchPoint) {
-        if(keysDown & HidNpadButton_B) this->Close();
+        if(keysDown & HidNpadButton_Plus) this->Close();
         else if(keysDown & HidNpadButton_Up) this->layout->MoveSelection(-1);
         else if(keysDown & HidNpadButton_Down) this->layout->MoveSelection(1);
         else if(keysDown & HidNpadButton_X) this->layout->EnableSelected();
         else if(keysDown & HidNpadButton_Y) this->layout->DisableSelected();
         else if(keysDown & HidNpadButton_A) this->layout->ToggleSelected();
-        else if(keysDown & HidNpadButton_Plus) this->layout->ToggleLanguage();
+        else if(keysDown & HidNpadButton_Minus) this->layout->ToggleLanguage();
     });
 }
