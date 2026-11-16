@@ -141,7 +141,7 @@ void MainLayout::Refresh() {
     AddPanel(this, 0, 0, 1280, 112, Red, 0);
     AddText(this, 54, 24, "PCHTXT-MANAGER", White, pu::ui::DefaultFontSize::Large);
     AddText(this, 56, 76, this->Text("パッチファイル管理", "PATCH FILE LIBRARY"), White, pu::ui::DefaultFontSize::Small);
-    AddText(this, 1010, 44, "SWITCH HOMEBREW", White, pu::ui::DefaultFontSize::Small);
+    AddText(this, 930, 44, "SWITCH HOMEBREW", White, pu::ui::DefaultFontSize::Small);
 
     AddText(this, 56, 145, this->Text("ファイル一覧", "Your files"), White, pu::ui::DefaultFontSize::Large);
     AddText(this, 56, 195, "switch/PCHTXT-Manager/", Muted, pu::ui::DefaultFontSize::Small);
@@ -178,8 +178,8 @@ void MainLayout::Refresh() {
     AddText(this, 62, 615, std::to_string(this->files.size()) + this->Text(" 個のファイル", " FILE(S)"), Muted, pu::ui::DefaultFontSize::Small);
     AddText(this, 62, 650, this->message, White, pu::ui::DefaultFontSize::Small);
     AddPanel(this, 0, 690, 1280, 30, Panel, 0);
-    AddText(this, 42, 691, this->Text("↑/↓ 選択   A 切替   X 有効   Y 無効   − 言語   ＋ 終了", "UP/DOWN Select   A Toggle   X Enable   Y Disable   - Language   + Exit"), White, pu::ui::DefaultFontSize::Small);
-    AddText(this, 870, 615, this->Text("ファイル整理のみ・パッチ適用はしません", "FILE ORGANIZER ONLY - DOES NOT APPLY PATCHES"), Muted, pu::ui::DefaultFontSize::Small);
+    AddText(this, 42, 691, this->Text("↑↓ 選択  A 切替  X ON  Y OFF  − 言語  ＋ 終了", "UP/DOWN  Select  A Toggle  X ON  Y OFF  - Language  + Exit"), White, pu::ui::DefaultFontSize::Small);
+    AddText(this, 930, 615, this->Text("整理専用・パッチ適用なし", "ORGANIZER ONLY / NO PATCHING"), Muted, pu::ui::DefaultFontSize::Small);
 }
 
 void MainLayout::MoveSelection(int delta) {
@@ -225,44 +225,51 @@ void MainApplication::OnLoad() {
         float drift;
         float phase;
         int width;
+        int height;
     };
-    static std::array<SakuraPetal, 14> petals{{
-        {95.0f, 35.0f, 0.42f, 0.16f, 0.2f, 9},
-        {260.0f, 210.0f, 0.34f, -0.12f, 1.1f, 7},
-        {420.0f, 80.0f, 0.48f, 0.10f, 2.0f, 8},
-        {585.0f, 320.0f, 0.38f, -0.14f, 2.8f, 10},
-        {735.0f, 145.0f, 0.31f, 0.13f, 3.7f, 7},
-        {890.0f, 390.0f, 0.45f, -0.10f, 4.5f, 9},
-        {1050.0f, 55.0f, 0.36f, 0.15f, 5.3f, 8},
-        {1190.0f, 270.0f, 0.41f, -0.13f, 0.7f, 10},
-        {175.0f, 510.0f, 0.33f, 0.11f, 1.7f, 8},
-        {350.0f, 620.0f, 0.46f, -0.15f, 2.5f, 9},
-        {650.0f, 545.0f, 0.35f, 0.12f, 3.4f, 7},
-        {820.0f, 680.0f, 0.43f, -0.11f, 4.2f, 10},
-        {980.0f, 590.0f, 0.32f, 0.14f, 5.0f, 8},
-        {1135.0f, 475.0f, 0.39f, -0.12f, 5.8f, 9}
-    }};
+    // A fuller shower of larger petals, distributed across the whole 1280x720 canvas.
+    static std::array<SakuraPetal, 48> petals = []() {
+        std::array<SakuraPetal, 48> result{};
+        for(std::size_t i = 0; i < result.size(); ++i) {
+            const float fi = static_cast<float>(i);
+            result[i] = {
+                std::fmod(fi * 271.0f + 37.0f, 1280.0f),
+                std::fmod(fi * 157.0f + 19.0f, 720.0f),
+                0.55f + std::fmod(fi * 0.137f, 0.48f),
+                (static_cast<int>(i % 5) - 2) * 0.10f,
+                fi * 0.71f,
+                13 + static_cast<int>(i % 5) * 2,
+                8 + static_cast<int>(i % 4) * 2
+            };
+        }
+        return result;
+    }();
 
     this->AddRenderCallback([this]() {
-        const pu::ui::Color petalColor{255, 190, 210, 78};
-        for(auto &petal : petals) {
-            const int x = static_cast<int>(petal.x + std::sin(petal.phase) * 7.0f);
+        const pu::ui::Color petalColors[] = {
+            pu::ui::Color{255, 177, 204, 112},
+            pu::ui::Color{255, 195, 215, 120},
+            pu::ui::Color{255, 215, 225, 105}
+        };
+        for(std::size_t i = 0; i < petals.size(); ++i) {
+            auto &petal = petals[i];
+            const int x = static_cast<int>(petal.x + std::sin(petal.phase) * 12.0f);
             const int y = static_cast<int>(petal.y);
             const int w = petal.width;
-            const int h = std::max(4, w - 4);
+            const int h = petal.height;
 
-            this->renderer->RenderRoundedRectangleFill(petalColor, x, y, w, h, h / 2);
+            this->renderer->RenderRoundedRectangleFill(petalColors[i % 3], x, y, w, h, h / 2);
 
             petal.y += petal.speed;
-            petal.x += petal.drift + std::sin(petal.phase) * 0.18f;
-            petal.phase += 0.025f;
+            petal.x += petal.drift + std::sin(petal.phase) * 0.30f;
+            petal.phase += 0.035f;
 
-            if(petal.y > 730.0f) {
-                petal.y = -12.0f;
-                petal.x = std::fmod(petal.x + 137.0f, 1280.0f);
+            if(petal.y > 735.0f) {
+                petal.y = -static_cast<float>(petal.height);
+                petal.x = std::fmod(petal.x + 193.0f, 1280.0f);
             }
-            if(petal.x < -16.0f) petal.x = 1290.0f;
-            if(petal.x > 1296.0f) petal.x = -10.0f;
+            if(petal.x < -24.0f) petal.x = 1300.0f;
+            if(petal.x > 1304.0f) petal.x = -20.0f;
         }
     });
 
