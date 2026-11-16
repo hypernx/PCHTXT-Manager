@@ -1,5 +1,7 @@
 #include <MainApplication.hpp>
 #include <algorithm>
+#include <array>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <sys/stat.h>
@@ -214,6 +216,56 @@ void MainLayout::ToggleLanguage() {
 void MainApplication::OnLoad() {
     this->layout = MainLayout::New();
     this->LoadLayout(this->layout);
+
+    // Soft sakura petals are drawn before the layout elements, so the UI stays in front.
+    struct SakuraPetal {
+        float x;
+        float y;
+        float speed;
+        float drift;
+        float phase;
+        int width;
+    };
+    static std::array<SakuraPetal, 14> petals{{
+        {95.0f, 35.0f, 0.42f, 0.16f, 0.2f, 9},
+        {260.0f, 210.0f, 0.34f, -0.12f, 1.1f, 7},
+        {420.0f, 80.0f, 0.48f, 0.10f, 2.0f, 8},
+        {585.0f, 320.0f, 0.38f, -0.14f, 2.8f, 10},
+        {735.0f, 145.0f, 0.31f, 0.13f, 3.7f, 7},
+        {890.0f, 390.0f, 0.45f, -0.10f, 4.5f, 9},
+        {1050.0f, 55.0f, 0.36f, 0.15f, 5.3f, 8},
+        {1190.0f, 270.0f, 0.41f, -0.13f, 0.7f, 10},
+        {175.0f, 510.0f, 0.33f, 0.11f, 1.7f, 8},
+        {350.0f, 620.0f, 0.46f, -0.15f, 2.5f, 9},
+        {650.0f, 545.0f, 0.35f, 0.12f, 3.4f, 7},
+        {820.0f, 680.0f, 0.43f, -0.11f, 4.2f, 10},
+        {980.0f, 590.0f, 0.32f, 0.14f, 5.0f, 8},
+        {1135.0f, 475.0f, 0.39f, -0.12f, 5.8f, 9}
+    }};
+
+    this->AddRenderCallback([this]() {
+        const pu::ui::Color petalColor{255, 190, 210, 78};
+        for(auto &petal : petals) {
+            const int x = static_cast<int>(petal.x + std::sin(petal.phase) * 7.0f);
+            const int y = static_cast<int>(petal.y);
+            const int w = petal.width;
+            const int h = std::max(4, w - 4);
+
+            this->renderer->RenderRoundedRectangleFill(petalColor, x, y, w, h, h / 2);
+
+            petal.y += petal.speed;
+            petal.x += petal.drift + std::sin(petal.phase) * 0.18f;
+            petal.phase += 0.025f;
+
+            if(petal.y > 730.0f) {
+                petal.y = -12.0f;
+                petal.x = std::fmod(petal.x + 137.0f, 1280.0f);
+            }
+            if(petal.x < -16.0f) petal.x = 1290.0f;
+            if(petal.x > 1296.0f) petal.x = -10.0f;
+        }
+    });
+
     this->SetOnInput([&](const u64 keysDown, const u64, const u64, const pu::ui::TouchPoint) {
         if(keysDown & HidNpadButton_Plus) this->Close();
         else if(keysDown & HidNpadButton_Up) this->layout->MoveSelection(-1);
