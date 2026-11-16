@@ -1,41 +1,36 @@
-# PCHTXT-Manager - Nintendo Switch homebrew build
+# Nintendo Switch homebrew build using devkitPro and Plutonium.
+.SUFFIXES:
+
+ifeq ($(strip $(DEVKITPRO)),)
+$(error "Please set DEVKITPRO in your environment.")
+endif
+
+TOPDIR ?= $(CURDIR)
+include $(DEVKITPRO)/libnx/switch_rules
+
 TARGET := PCHTXT-Manager
 BUILD := build
 SOURCES := source
-
-DEVKITPRO ?= /opt/devkitpro
-PREFIX := aarch64-none-elf-
-CC := $(PREFIX)gcc
+INCLUDES := source
 
 ARCH := -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
-CFLAGS := -g -Wall -Wextra -O2 -ffunction-sections -fdata-sections $(ARCH)
-CFLAGS += -D__SWITCH__ -I$(DEVKITPRO)/libnx/include
+CFLAGS := -g -Wall -Wextra -O2 -ffunction-sections $(ARCH) -D__SWITCH__
+CXXFLAGS := $(CFLAGS) -std=gnu++17 -fno-rtti -fno-exceptions
+LDFLAGS := -specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,--gc-sections
 
-LDFLAGS := -specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH)
-LDFLAGS += -Wl,--gc-sections -L$(DEVKITPRO)/libnx/lib
-LIBS := -lnx
-
-SOURCES_C := $(wildcard $(SOURCES)/*.c)
-OBJECTS := $(patsubst $(SOURCES)/%.c,$(BUILD)/%.o,$(SOURCES_C))
+LIBDIRS := $(PORTLIBS) $(LIBNX) $(CURDIR)/Plutonium
+LIBS := -lpu -lSDL2_mixer -lopusfile -lopus -lmodplug -lmpg123 -lvorbisidec -logg \
+        -lSDL2_ttf -lSDL2_gfx -lSDL2_image -lSDL2 -lEGL -lGLESv2 -lglapi \
+        -ldrm_nouveau -lwebp -lpng -ljpeg `sdl2-config --libs` \
+        -lfreetype -lharfbuzz -lz -lbz2 -lnx
 
 .PHONY: all clean
-all: $(TARGET).nro
+all: Plutonium/lib/libpu.a
+	$(MAKE) -f $(DEVKITPRO)/libnx/switch_rules TARGET=$(TARGET) BUILD=$(BUILD) SOURCES=$(SOURCES) INCLUDES=$(INCLUDES) LIBDIRS="$(LIBDIRS)" LIBS="$(LIBS)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" all
 
-$(BUILD):
-	mkdir -p $(BUILD)
-
-$(BUILD)/%.o: $(SOURCES)/%.c | $(BUILD)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(TARGET).elf: $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
-
-# Convert the repository SVG icon to the JPEG format accepted by elf2nro.
-icon.jpg: icon.svg
-	convert icon.svg -resize 256x256 -gravity center -extent 256x256 -quality 90 $@
-
-$(TARGET).nro: $(TARGET).elf icon.jpg
-	elf2nro $(TARGET).elf $@ --icon=icon.jpg
+Plutonium/lib/libpu.a:
+	$(MAKE) -C Plutonium
 
 clean:
-	rm -rf $(BUILD) $(TARGET).elf $(TARGET).nro
+	rm -rf $(BUILD) $(TARGET).elf $(TARGET).nro $(TARGET).nacp
+	$(MAKE) -C Plutonium clean
