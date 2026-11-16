@@ -2,7 +2,7 @@ name: Build NRO
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature/cpp-graphical-ui ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -16,9 +16,14 @@ jobs:
       PATH: /opt/devkitpro/devkitA64/bin:/opt/devkitpro/tools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     steps:
       - uses: actions/checkout@v4
-      - name: Verify preinstalled Switch toolchain
+        with:
+          submodules: recursive
+      - name: Install Switch GUI dependencies
         run: |
-          command -v aarch64-none-elf-gcc
+          dkp-pacman -S --noconfirm switch-sdl2 switch-sdl2_ttf switch-sdl2_image switch-sdl2_gfx switch-sdl2_mixer switch-mesa switch-glad switch-glm switch-libdrm_nouveau switch-libwebp switch-libpng switch-freetype switch-bzip2 switch-libjpeg-turbo switch-opusfile switch-libopus
+      - name: Verify toolchain
+        run: |
+          command -v aarch64-none-elf-g++
           command -v elf2nro
           test -d "$DEVKITPRO/libnx/include"
       - name: Install icon converter
